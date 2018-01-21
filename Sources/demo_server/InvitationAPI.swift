@@ -10,45 +10,46 @@ class InvitationAPI {
         return invitationsJson
     }
     
-    static func matchingCity(_ matchingCity: String) throws -> String {
-        let invitations = try Invitation.getInvitation(matchingCity: matchingCity)
-        return try invitationsToDictionary(invitations).jsonEncodedString()
-    }
-    
-    static func matchingCity(withJSONRequest json: String?) throws -> String {
-        guard let json = json,
-        let dict = try json.jsonDecode() as? [String: Any],
-            let city = dict["city"] as? String else {
-                return "Invalid parameter"
-        }
-        return try matchingCity(city)
-    }
-    
-    static func newInvitation(withpw pw: String, userid: String, city: String, languages: [String]) throws -> [String: Any] {
-        let invitation = Invitation()
-        invitation.pw = pw
-        invitation.userid = userid
-        invitation.city = city
-        invitation.languages = languages
-        try invitation.save {
-            id in invitation.id = id as! Int
-        }
+    static func invitationToDictionary(_ invitation: Invitation) throws -> [String: Any]{
         return invitation.asDictionary()
     }
     
+    
+    static func getInvitationWithUser(matchingCity city: String, user: String) throws -> String{
+        let invitation = try Invitation.getInvitation(matchingCity: city, user: user)
+        if invitation.city == ""{
+            var nothingJSON : [[String: Any]] = []
+            return try nothingJSON.jsonEncodedString()
+        }
+        return try invitationToDictionary(invitation).jsonEncodedString()
+    }
+    
+    static func getInvitations(matchingCity city: String) throws -> String{
+        let invitations = try Invitation.getInvitations(matchingCity: city)
+        
+        return try invitationsToDictionary(invitations).jsonEncodedString()
+    }
+    
+    static func newInvitation(withUserid userid: String, city: String, languages: [String]) throws -> String {
+        let invitation = Invitation()
+        invitation.userid = userid
+        invitation.city = city
+        invitation.languages = languages
+        return invitation.saveInvitation()
+    }
 
     
     static func newInvitation(withJSONRequest json: String?) throws -> String {
         guard let json = json,
         let dict = try json.jsonDecode() as? [String: Any],
-            let pw = dict["pw"] as? String,
-            let userid = dict["userid"] as? String,
+            let userid = dict["id"] as? String,
             let city = dict["city"] as? String,
             let languages = dict["languages"] as? [String] else {
                     return "Invalid parameters"
         }
         
-        return try newInvitation(withpw: pw, userid: userid, city: city, languages: languages).jsonEncodedString()
+        return try newInvitation(withUserid: userid, city: city, languages: languages).jsonEncodedString()
     }
+    
     
 }

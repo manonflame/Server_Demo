@@ -33,4 +33,15 @@ class User: PostgresStORM {
         ]
     }
     
+    static func getUser(id: String) throws -> User {
+        let getObj = User()
+        var findObj = [String: Any]()
+        findObj["id"] = id
+        try getObj.find(findObj)
+        print("getUsers: \(getObj.id)")
+        print("getUsers id: \(id)")
+        print("getUsers: \(getObj.pw)")
+        return getObj
+    }
+    
 }
