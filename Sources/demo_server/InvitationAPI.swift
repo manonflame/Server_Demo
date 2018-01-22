@@ -42,11 +42,13 @@ class InvitationAPI {
     static func newInvitation(withJSONRequest json: String?) throws -> String {
         guard let json = json,
         let dict = try json.jsonDecode() as? [String: Any],
-            let userid = dict["id"] as? String,
+        let userid = dict["userid"] as? String,
             let city = dict["city"] as? String,
             let languages = dict["languages"] as? [String] else {
                     return "Invalid parameters"
         }
+        
+        
         
         return try newInvitation(withUserid: userid, city: city, languages: languages).jsonEncodedString()
     }
