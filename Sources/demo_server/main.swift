@@ -4,6 +4,7 @@ import PerfectHTTPServer
 import StORM
 import PostgresStORM
 import PerfectPostgreSQL
+import PerfectNotifications
 
 PostgresConnector.host = "localhost"
 PostgresConnector.username = "demo"

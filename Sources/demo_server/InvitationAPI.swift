@@ -1,5 +1,6 @@
 import Foundation
 
+
 class InvitationAPI {
     
     static func invitationsToDictionary(_ invitations:[Invitation]) -> [[String: Any]]{

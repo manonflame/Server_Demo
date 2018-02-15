@@ -63,8 +63,9 @@ final class BasicController {
     
     func signin(request: HTTPRequest, response: HTTPResponse) {
         do {
-            print("sign in()")
+            
             let json = try UserAPI.newUser(withJSONRequest: request.postBodyString)
+            print("sign in() :: \(json)")
             response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
             
         } catch {

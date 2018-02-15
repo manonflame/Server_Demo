@@ -5,6 +5,7 @@ class User: PostgresStORM {
     var id: String = ""
     var pw: String = ""
     var languages: [String] = [String]()
+    var deviceToken = ""
     
     override open func table() -> String { return "Users" }
     
@@ -13,6 +14,7 @@ class User: PostgresStORM {
         id = this.data["id"] as? String ?? ""
         pw = this.data["pw"] as? String ?? ""
         languages = this.data["languages"] as? [String] ?? [String]()
+        deviceToken = this.data["deviceToken"] as? String ?? ""
     }
     
     func rows() -> [User]{
@@ -29,7 +31,8 @@ class User: PostgresStORM {
         return [
             "id": self.id,
             "pw": self.pw,
-            "languages": self.languages
+            "languages": self.languages,
+            "deviceToken": self.deviceToken
         ]
     }
     
@@ -38,9 +41,6 @@ class User: PostgresStORM {
         var findObj = [String: Any]()
         findObj["id"] = id
         try getObj.find(findObj)
-        print("getUsers: \(getObj.id)")
-        print("getUsers id: \(id)")
-        print("getUsers: \(getObj.pw)")
         return getObj
     }
     

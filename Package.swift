@@ -7,6 +7,7 @@ let package = Package(
     dependencies: [
         .Package(url: "https://github.com/PerfectlySoft/Perfect-HTTPServer.git", majorVersion: 3),
         .Package(url: "https://github.com/SwiftORM/Postgres-StORM.git", majorVersion: 3),
+        .Package(url:"https://github.com/PerfectlySoft/Perfect-Notifications.git", majorVersion: 3)
         ]
 )
 
