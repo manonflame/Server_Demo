@@ -23,6 +23,8 @@ class UserAPI {
         print(user.pw)
         print(user.languages)
         print(user.deviceToken)
+        
+        //회원 테이블에 유저 추가
         do{
             let p = PGConnection()
             let status = p.connectdb("host=localhost dbname=demo_db")
@@ -38,13 +40,17 @@ class UserAPI {
             return noUser.asDictionary()
         }
         
+        //유저 테이블 만들기
         do{
             let p = PGConnection()
             let status = p.connectdb("host=localhost dbname=demo_db")
             defer{
                 p.close()
             }
-            let result = p.exec(statement: "CREATE TABLE User_\(user.id) (sender varchar(20), timeStamp varchar(20), content varchar(2000);")
+            let result = p.exec(statement: "CREATE TABLE User_\(user.id) (sender varchar(20), timeStamp varchar(20), content varchar(2000));")
+            
+            //demo_db권한 부여
+            let grant = p.exec(statement: "GRANT ALL ON user_\(user.id) TO demo;")
         }
         
         
@@ -123,6 +129,16 @@ class UserAPI {
                     
                     arr.append(message.asDictionary())
                 }
+            }
+            
+            //쌓여있던 데이터를 지움
+            do{
+                let p = PGConnection()
+                let status = p.connectdb("host=localhost dbname=demo_db")
+                defer{
+                    p.close()
+                }
+                let queryResult = p.exec(statement: "DELETE FROM User_\(user.id);")
             }
             
             //쿼리문을 받아서 메시지 객체에 넣음

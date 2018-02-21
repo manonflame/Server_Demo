@@ -18,17 +18,7 @@ class Messenger {
     
     
     //유저 테이블에 데이터들을 넣음
-    static func insertIntoUserTable(to: String, from: String, timeStamp: String, message: String){
-        //***이거 지워야함.
-        do{
-            let p = PGConnection()
-            let status = p.connectdb("host=localhost dbname=demo_db")
-            defer{
-                p.close()
-            }
-            let result = p.exec(statement: "INSERT INTO User_\(to) VALUES ('\(from)', '\(timeStamp)', '\(message)');")
-        }
-        
+    static func insertIntoUserTable(to: String, from: String, timeStamp: String, message: String){        
         Messenger.pushNotificationToUser(to: to, from: from, timeStamp: timeStamp, message: message)
     }
     
