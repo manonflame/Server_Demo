@@ -38,8 +38,19 @@ class UserAPI {
             return noUser.asDictionary()
         }
         
+        do{
+            let p = PGConnection()
+            let status = p.connectdb("host=localhost dbname=demo_db")
+            defer{
+                p.close()
+            }
+            let result = p.exec(statement: "CREATE TABLE User_\(user.id) (sender varchar(20), timeStamp varchar(20), content varchar(2000);")
+        }
+        
+        
         return user.asDictionary()
     }
+    
     
     static func newUser(withJSONRequest json: String?) throws -> String {
         guard let json = json,
@@ -63,7 +74,8 @@ class UserAPI {
             let pw = dict["pw"] as? String,
             let languages = dict["languages"] as? [String],
             let deviceToken = dict["deviceToken"] as? String else {
-                return "Invalid Parameters"
+                var result = ["result": "Invalid Parameters"]
+                return try result.jsonEncodedString()
         }
 
         //select user from db
@@ -72,18 +84,16 @@ class UserAPI {
         
         //no user - return no user
         if user.id == "" {
-            print("no user")
-            return "no user"
+            var result = ["result": "no user"]
+            return try result.jsonEncodedString()
         }
         
         //pw not matched - return not matched
-        print("test : \(deviceToken)")
         if user.pw != pw {
-            print("not matched password")
-            return "not matched password"
+            var result = ["result": "not matched password"]
+            return try result.jsonEncodedString()
         }else{
             //success - return success
-            print("login succeed")
             //디바이스 토큰 업데이트
             do {
                 let p = PGConnection()
@@ -93,7 +103,35 @@ class UserAPI {
                 }
                 let result = p.exec(statement: "UPDATE users SET deviceToken = '\(deviceToken)' WHERE id = '\(user.id)';")
             }
-            return "login succeed"
+            
+            var arr = [[String : Any]]()
+            //유저테이블을 검색함
+            do {
+                let p = PGConnection()
+                let status = p.connectdb("host=localhost dbname=demo_db")
+                defer{
+                    p.close()
+                }
+                let queryResult = p.exec(statement: "SELECT * from User_\(user.id);")
+                let count = queryResult.numTuples()
+                
+                for x in 0 ..< count {
+                    var message = Message()
+                    message.sender = queryResult.getFieldString(tupleIndex: x, fieldIndex: 0)!
+                    message.timeStamp = queryResult.getFieldString(tupleIndex: x, fieldIndex: 1)!
+                    message.comment = queryResult.getFieldString(tupleIndex: x, fieldIndex: 2)!
+                    
+                    arr.append(message.asDictionary())
+                }
+            }
+            
+            //쿼리문을 받아서 메시지 객체에 넣음
+            //메시지 객체를 String으로 변환
+            let result : [String: Any] = ["result": "login succeed", "arr" : arr]
+            
+            print("--------------")
+            print(try result.jsonEncodedString())
+            return try result.jsonEncodedString()
         }
     }
     

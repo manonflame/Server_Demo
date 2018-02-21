@@ -13,6 +13,13 @@ PostgresConnector.database = "demo_db"
 PostgresConnector.port = 5432
 
 
+//APNS Configuartion
+let notificationsAppId = "KJ.demo-FollowME"
+let apnsKeyIdentifier = "9RL2PYA93U"
+let apnsTeamIdentifier = "SMWAEJPYXQ"
+let apnsPrivateKeyFilePath = "/Users/KyungjunMin/Desktop/ios/Certifications&CSR/AuthKey_9RL2PYA93U.p8"
+NotificationPusher.addConfigurationAPNS(name: notificationsAppId, production: false, keyId: apnsKeyIdentifier, teamId: apnsTeamIdentifier, privateKeyPath: apnsPrivateKeyFilePath)
+
 
 let setupInvitation = Invitation()
 try? setupInvitation.setup()
