@@ -50,7 +50,7 @@ class Messenger {
                     n.pushAPNS(
                         configurationName: Messenger.notificationsAppId,
                         deviceToken: String(gotdeviceToken),
-                        notificationItems: [.alertBody("\(from) : \(message)"), .sound("default"), .badge(69), .category("\(timeStamp)")]) {
+                        notificationItems: [.alertBody("\(from) : \(message)"), .sound("default"), .badge(69), .contentAvailable, .category("\(timeStamp)")]) {
                             responses in
                             print("ASDFASDF  \(timeStamp)")
                             print("\(responses)")
