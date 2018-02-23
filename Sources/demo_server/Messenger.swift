@@ -37,15 +37,19 @@ class Messenger {
                 
                 if gotdeviceToken == "empty" {
                     do{
+                        print("디바이스 토큰이 없어서 디비에 저장")
                         let p = PGConnection()
                         let status = p.connectdb("host=localhost dbname=demo_db")
                         defer{
                             p.close()
                         }
                         let result = p.exec(statement: "INSERT INTO User_\(to) VALUES ('\(from)', '\(timeStamp)', '\(message)');")
+                        print(result.errorMessage())
+                        print(result.status())
                     }
                 }
                 else{
+                    print("디바이스 토큰이 있어서 쏨")
                     let n = NotificationPusher(apnsTopic: Messenger.notificationsAppId)
                     n.pushAPNS(
                         configurationName: Messenger.notificationsAppId,

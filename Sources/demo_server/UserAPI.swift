@@ -47,7 +47,7 @@ class UserAPI {
             defer{
                 p.close()
             }
-            let result = p.exec(statement: "CREATE TABLE User_\(user.id) (sender varchar(20), timeStamp varchar(20), content varchar(2000));")
+            let result = p.exec(statement: "CREATE TABLE User_\(user.id) (sender varchar(20), timeStamp varchar(25), content varchar(2000));")
             
             //demo_db권한 부여
             let grant = p.exec(statement: "GRANT ALL ON user_\(user.id) TO demo;")
