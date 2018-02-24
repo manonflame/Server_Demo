@@ -11,6 +11,7 @@ final class BasicController {
             Route(method: .post, uri: "/signin", handler: signin),
             Route(method: .post, uri: "/sendingMessage", handler: messageArrived),
             Route(method: .post, uri: "/login", handler: login),
+            Route(method: .post, uri: "/logout", handler: logout),
             Route(method: .post, uri: "/checkMessage", handler: checkMessage),
             Route(method: .get, uri: "/getInvitaion/{city}/{user}", handler: getInvitation),
             Route(method: .get, uri: "/searchInvitations/{city}", handler: searchInvitations)
@@ -121,6 +122,18 @@ final class BasicController {
         do {
             print("log in()")
             let json = try UserAPI.loginUser(withJSONRequest: request.postBodyString)
+            
+            response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
+            
+        } catch {
+            response.setBody(string: "Error handling request: \(error)").completed(status: .internalServerError)
+        }
+    }
+    
+    func logout(request: HTTPRequest, response: HTTPResponse) {
+        do {
+            print("log out()")
+            let json = try UserAPI.logoutUser(withJSONRequest: request.postBodyString)
             
             response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
             

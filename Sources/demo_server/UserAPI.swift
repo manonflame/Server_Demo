@@ -73,9 +73,8 @@ class UserAPI {
     
     static func loginUser(withJSONRequest json: String?) throws -> String{
         //decoding
-        var userRequested = User()
         guard let json = json,
-        let dict = try json.jsonDecode() as? [String: Any],
+            let dict = try json.jsonDecode() as? [String: Any],
             let id = dict["id"] as? String,
             let pw = dict["pw"] as? String,
             let languages = dict["languages"] as? [String],
@@ -141,7 +140,7 @@ class UserAPI {
                 let queryResult = p.exec(statement: "DELETE FROM User_\(user.id);")
             }
             
-            //쿼리문을 받아서 메시지 객체에 넣음
+            //쿼리문을 받아서 메시지 객체에 넣음***query에 따라 리턴값을  달리해야함
             //메시지 객체를 String으로 변환
             let result : [String: Any] = ["result": "login succeed", "arr" : arr]
             
@@ -151,4 +150,33 @@ class UserAPI {
         }
     }
     
+    static func logoutUser(withJSONRequest json: String?) throws -> String{
+        guard let json = json,
+            let dict = try json.jsonDecode() as? [String: Any],
+            let id = dict["id"] as? String else {
+                var result = ["result": "Invalid Parameters"]
+                return try result.jsonEncodedString()
+        }
+        //select user from db
+        var user = try User.getUser(id: id)
+        
+        
+        //no user - return no user
+        if user.id == "" {
+            var result = ["result": "no user"]
+            return try result.jsonEncodedString()
+        }
+        
+        do{
+            let p = PGConnection()
+            let status = p.connectdb("host=localhost dbname=demo_db")
+            defer{
+                p.close()
+            }
+            let queryResult = p.exec(statement: "UPDATE users SET deviceToken = 'empty' WHERE id = '\(user.id)';")
+        }
+        var arr = [[String : Any]]()
+        let result : [String: Any] = ["result": "logout succeed", "arr" : arr]
+        return try result.jsonEncodedString()
+    }
 }
