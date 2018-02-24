@@ -11,6 +11,7 @@ final class BasicController {
             Route(method: .post, uri: "/signin", handler: signin),
             Route(method: .post, uri: "/sendingMessage", handler: messageArrived),
             Route(method: .post, uri: "/login", handler: login),
+            Route(method: .post, uri: "/checkMessage", handler: checkMessage),
             Route(method: .get, uri: "/getInvitaion/{city}/{user}", handler: getInvitation),
             Route(method: .get, uri: "/searchInvitations/{city}", handler: searchInvitations)
         ]
@@ -30,6 +31,26 @@ final class BasicController {
         }
     }
     
+    func checkMessage(request: HTTPRequest, response: HTTPResponse){
+        var dic = [String: String]()
+        //유저 테이블에 데이터들을 넣음
+        if let data = request.postBodyString!.data(using: .utf8) {
+            do {
+                dic = (try JSONSerialization.jsonObject(with: data, options: []) as? [String : String])!
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        Messenger.checkMessage(checker: dic["checker"]!, from: dic["from"]!)
+        //***checkMessage의 리턴값을 바꿔서 다시 제이슨 을 설정해야함
+        do{
+            let json = "received"
+            response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
+        } catch {
+            response.setBody(string: "Error Handling Requset: \(error)").completed(status: .internalServerError)
+        }
+    }
+    
     func messageArrived(request: HTTPRequest, response: HTTPResponse){
         print(request.postBodyString!)
         var dic = [String: String]()
@@ -41,12 +62,10 @@ final class BasicController {
                 print(error.localizedDescription)
             }
         }
-        
-        print("testtest : \((dic["message"])!)")
         Messenger.insertIntoUserTable(to: dic["to"]!, from: dic["from"]!, timeStamp: dic["timeStamp"]!, message: dic["message"]!)
-        
-        
+    
         //디바이스 토큰이 empty가 아니면 푸시 노티피케이션을 보냄
+        //***insertIntoUserTable의 리턴값을 바꿔서 다시 제이슨 을 설정해야함
         do{
             let json = "received"
             response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
