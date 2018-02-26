@@ -53,8 +53,8 @@ class Messenger {
         } 
     }
     
-    //유저 테이블에 데이터들을 넣음
-    static func insertIntoUserTable(to: String, from: String, timeStamp: String, message: String){        
+    //유저 테이블에 데이터들을 넣음.
+    static func insertIntoUserTable(to: String, from: String, timeStamp: String, message: String){
         Messenger.pushNotificationToUser(to: to, from: from, timeStamp: timeStamp, message: message)
     }
     
@@ -70,16 +70,13 @@ class Messenger {
             do{
                 print("대화 내용 데이터베이스에 저장")
                 let result = p.exec(statement: "INSERT INTO User_\(to) VALUES ('\(from)', '\(timeStamp)', '\(message)');")
-                print(result.errorMessage())
-                print(result.status())
             }
             let result = p.exec(statement: "SELECT deviceToken from Users Where id = '\(to)';")
             let countResult = p.exec(statement: "SELECT count(*) FROM User_\(to);")
             let badgeCount = countResult.getFieldInt(tupleIndex: 0, fieldIndex: 0)
-            print("badge : \(badgeCount!)")
+
             if let gotdeviceToken = result.getFieldString(tupleIndex: 0, fieldIndex: 0){
-   
-                if gotdeviceToken != "empty" {
+                   if gotdeviceToken != "empty" {
                     print("디바이스 토큰이 있어서 쏨 : \(badgeCount!)")
                     let n = NotificationPusher(apnsTopic: Messenger.notificationsAppId)
                     n.pushAPNS(

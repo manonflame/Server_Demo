@@ -56,21 +56,17 @@ class Invitation: PostgresStORM {
             
             let num = result.numTuples()
 
-            if num == 0 {
-                
-            }
-            else{
-                var languagesStr = result.getFieldString(tupleIndex: 0, fieldIndex: 2)
-                getObj.userid = result.getFieldString(tupleIndex: 0, fieldIndex: 0)!
-                getObj.city = result.getFieldString(tupleIndex: 0, fieldIndex: 1)!
-                
-                languagesStr = languagesStr?.replacingOccurrences(of: "{", with: "")
-                languagesStr = languagesStr?.replacingOccurrences(of: "}", with: "")
-                getObj.languages = (languagesStr?.components(separatedBy: ","))!
-                print(getObj.languages)
-                result.clear()
-                p.close()
-            }
+            var languagesStr = result.getFieldString(tupleIndex: 0, fieldIndex: 2)
+            getObj.userid = result.getFieldString(tupleIndex: 0, fieldIndex: 0)!
+            getObj.city = result.getFieldString(tupleIndex: 0, fieldIndex: 1)!
+            
+            languagesStr = languagesStr?.replacingOccurrences(of: "{", with: "")
+            languagesStr = languagesStr?.replacingOccurrences(of: "}", with: "")
+            getObj.languages = (languagesStr?.components(separatedBy: ","))!
+            print(getObj.languages)
+            result.clear()
+            p.close()
+            
         } catch {
             print("INVITATION LOAD ERROR IN GET INVITATION::1")
         }

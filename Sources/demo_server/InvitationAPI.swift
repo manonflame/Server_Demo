@@ -1,5 +1,6 @@
 import Foundation
-
+import PostgresStORM
+import PerfectPostgreSQL
 
 class InvitationAPI {
     
@@ -22,8 +23,23 @@ class InvitationAPI {
             var nothingJSON : [[String: Any]] = []
             return try nothingJSON.jsonEncodedString()
         }
-        return try invitationToDictionary(invitation).jsonEncodedString()
+        var  dictionary = try invitationToDictionary(invitation)
+        
+        do{
+            let p = PGConnection()
+            let status = p.connectdb("host=localhost dbname=demo_db")
+            defer{
+                p.close()
+            }
+            let result = p.exec(statement: "SELECT ENCODE(profileImage,'base64') FROM Users WHERE id = '\(user)';")
+            
+            dictionary["profileImage"] = result.getFieldString(tupleIndex: 0, fieldIndex: 0)
+        }
+        
+        
+        return try dictionary.jsonEncodedString()
     }
+    
     
     static func getInvitations(matchingCity city: String) throws -> String{
         let invitations = try Invitation.getInvitations(matchingCity: city)
@@ -48,9 +64,7 @@ class InvitationAPI {
             let languages = dict["languages"] as? [String] else {
                     return "Invalid parameters"
         }
-        
-        
-        
+
         return try newInvitation(withUserid: userid, city: city, languages: languages).jsonEncodedString()
     }
     

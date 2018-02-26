@@ -1,11 +1,13 @@
 import StORM
 import PostgresStORM
 
+
 class User: PostgresStORM {
     var id: String = ""
     var pw: String = ""
     var languages: [String] = [String]()
     var deviceToken = ""
+    var profileImage = ""
     
     override open func table() -> String { return "Users" }
     
@@ -15,6 +17,7 @@ class User: PostgresStORM {
         pw = this.data["pw"] as? String ?? ""
         languages = this.data["languages"] as? [String] ?? [String]()
         deviceToken = this.data["deviceToken"] as? String ?? ""
+        profileImage = this.data["profileImage"] as? String ?? ""
     }
     
     func rows() -> [User]{
@@ -32,7 +35,8 @@ class User: PostgresStORM {
             "id": self.id,
             "pw": self.pw,
             "languages": self.languages,
-            "deviceToken": self.deviceToken
+            "deviceToken": self.deviceToken,
+            "profileImage": self.profileImage
         ]
     }
     

@@ -12,12 +12,13 @@ class UserAPI {
     }
     
     //회원 가입용
-    static func newUser(withId id: String, pw: String, languages: [String], deviceToken: String) throws -> [String: Any] {
+    static func newUser(withId id: String, pw: String, languages: [String], deviceToken: String, profileImage: String) throws -> [String: Any] {
         let user = User()
         user.id = id
         user.pw = pw
         user.languages = languages
         user.deviceToken = deviceToken
+        user.profileImage = profileImage
         print("saving")
         print(user.id)
         print(user.pw)
@@ -31,7 +32,8 @@ class UserAPI {
             defer{
                 p.close()
             }
-            let result = p.exec(statement: "INSERT INTO USERS VALUES ('\(user.id)', '\(user.pw)', '{ }', '');")
+            let result = p.exec(statement: "INSERT INTO USERS VALUES ('\(user.id)', '\(user.pw)', '{ }', 'empty', decode('\(user.profileImage)', 'base64') );")
+            print(result.errorMessage())
         }
         catch{
             var noUser = User()
@@ -57,6 +59,24 @@ class UserAPI {
         return user.asDictionary()
     }
     
+    static func getImage(of owner: String) throws -> String {
+        var dic = [String: Any]()
+        do{
+            let p = PGConnection()
+            let status = p.connectdb("host=localhost dbname=demo_db")
+            defer{
+                p.close()
+            }
+            let result = p.exec(statement: "SELECT ENCODE(profileImage,'base64') FROM Users WHERE id = '\(owner)';")
+            dic["profileImage"] = result.getFieldString(tupleIndex: 0, fieldIndex: 0)
+            print("check : \(dic)")
+        } catch {
+            print("ERROR IN USER API: getImage")
+            dic["profileImage"] = "Error"
+        }
+        return try dic.jsonEncodedString()
+    }
+    
     
     static func newUser(withJSONRequest json: String?) throws -> String {
         guard let json = json,
@@ -64,10 +84,11 @@ class UserAPI {
             let id = dict["id"] as? String,
             let pw = dict["pw"] as? String,
             let languages = dict["languages"] as? [String],
-            let deviceToken = dict["deviceToken"] as? String else {
+            let deviceToken = dict["deviceToken"] as? String,
+            let profileImage = dict["profileImage"] as? String else {
                 return "Invalid Parameters"
         }
-        return try newUser(withId: id, pw: pw, languages: languages, deviceToken: deviceToken).jsonEncodedString()
+        return try newUser(withId: id, pw: pw, languages: languages, deviceToken: deviceToken, profileImage: profileImage).jsonEncodedString()
     }
     
     

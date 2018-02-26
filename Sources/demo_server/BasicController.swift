@@ -14,6 +14,7 @@ final class BasicController {
             Route(method: .post, uri: "/logout", handler: logout),
             Route(method: .post, uri: "/checkMessage", handler: checkMessage),
             Route(method: .get, uri: "/getInvitaion/{city}/{user}", handler: getInvitation),
+            Route(method: .get, uri: "/getImage/{owner}", handler: getImage),
             Route(method: .get, uri: "/searchInvitations/{city}", handler: searchInvitations)
         ]
     }
@@ -65,7 +66,6 @@ final class BasicController {
         }
         Messenger.insertIntoUserTable(to: dic["to"]!, from: dic["from"]!, timeStamp: dic["timeStamp"]!, message: dic["message"]!)
     
-        //디바이스 토큰이 empty가 아니면 푸시 노티피케이션을 보냄
         //***insertIntoUserTable의 리턴값을 바꿔서 다시 제이슨 을 설정해야함
         do{
             let json = "received"
@@ -92,6 +92,20 @@ final class BasicController {
         }
     }
     
+    func getImage(request: HTTPRequest, response: HTTPResponse) {
+        guard let owner = request.urlVariables["owner"] else {
+            response.completed(status: .badRequest)
+            return
+        }
+        do{
+            let json = try UserAPI.getImage(of: owner)
+            response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
+        } catch {
+            response.setBody(string: "Error handling request: \(error)").completed(status: .internalServerError)
+        }
+        
+    }
+    
 
     
     func newInvitation(request: HTTPRequest, response: HTTPResponse) {
@@ -110,7 +124,6 @@ final class BasicController {
         do {
             
             let json = try UserAPI.newUser(withJSONRequest: request.postBodyString)
-            print("sign in() :: \(json)")
             response.setBody(string: json).setHeader(.contentType, value: "application/json").completed()
             
         } catch {
